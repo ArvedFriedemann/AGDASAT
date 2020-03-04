@@ -1,5 +1,11 @@
 module versat where
 
+data BOT : Set where
+
+infix 3 ¬_
+¬_ : Set -> Set
+¬ prop = prop -> BOT
+
 data Bool : Set where
   true : Bool
   false : Bool
@@ -23,6 +29,7 @@ sigma-syntax = sigma
 infix 2 sigma-syntax
 syntax sigma-syntax A (\ x -> B) = exists x of A st B
 
+infixr 1 _or_
 data _or_ (A B : Set) : Set where
   left : A -> A or B
   right : B -> A or B
@@ -30,7 +37,8 @@ data _or_ (A B : Set) : Set where
 data _===_ {A : Set} (x : A) : A -> Set where
   refl : x === x
 
-data BOT : Set where
+const : {A B : Set} -> A -> B -> A
+const x _ = x
 
 data Formula (X : Set) : Set where
   top : Formula X
@@ -40,7 +48,6 @@ data Formula (X : Set) : Set where
   _^_ : Formula X -> Formula X -> Formula X
   _v_ : Formula X -> Formula X -> Formula X
 
-{-
 eval : {X : Set} -> (X -> Bool) -> Formula X -> Bool
 eval _ top = true
 eval _ bot = false
@@ -48,12 +55,16 @@ eval fkt (val x) = fkt x
 eval fkt (neg f) = not (eval fkt f)
 eval fkt (a ^ b) = (eval fkt a) && (eval fkt b)
 eval fkt (a v b) = (eval fkt a) || (eval fkt b)
--}
 
-solver-creation : {X A : Set} ->
-                  (evalfkt : (X -> A) -> Formula X -> A) ->
-                  exists solver of (Formula X -> A -> (X -> A)) st
-                    ((f : Formula X) (a : A) ->
-                      (evalfkt (solver f a) f === a) or
-                      ((model : X -> A) -> evalfkt model f === a -> BOT) )
-solver-creation evalfkt = {! !}
+solver : {A : Set} -> (aim : Bool) -> (f : Formula A) -> (exists m of (A -> Bool) st (eval m f === aim) ) or (forall (m : A -> Bool) -> ¬ (eval m f === aim) )
+
+solver true top = left < const false , refl >
+solver false top = right (\m ())
+solver false bot = left < const false , refl >
+solver true bot = right (\m ())
+
+solver aim (val x) = left < const aim , refl >
+
+solver aim (neg f) = {! !}
+solver aim (a ^ b) = {! !}
+solver aim (a v b) = {! !}
