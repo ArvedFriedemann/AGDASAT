@@ -1,0 +1,7 @@
+This could be way more abstracted
+technically, neither the solver nor the evaluation function matter. It is just a fact that, for every evaluation function, there is a solver confirming it. The evaluation function would then just need to run on a datatype that is expressive enough to cover all other datatypes and tada! a universal construction. This has partially already been done in the bachelor thesis I found somewhere. This would need to be extended to evaluation functions being in a monadic context and to describe some complexity criteria.
+
+Oh...WARNING! This obviously only works if some things are known about eval. E.g., it needs to behave somewhat recursive. e.g. eval (val x) = y should be quite solid and there should be no two definitions like eval ((val x) ^ b) = c1 and eval ((a v b) ^ c) = c2 ...I guess that could cause problems.
+
+
+TODO: Send report!
