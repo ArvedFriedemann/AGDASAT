@@ -1,15 +1,15 @@
 module util where
 
 
-open import Agda.Primitive renaming (_⊔_ to _~U~_ )
+open import Agda.Primitive renaming (_⊔_ to _~U~_ ) public
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq using (refl; trans; sym; cong; cong-app; subst) renaming (_≡_ to _===_)
-open Eq.≡-Reasoning using (begin_; step-≡; step-≡˘) renaming (_≡⟨⟩_ to _=<>_ ; _∎ to _end)
+import Relation.Binary.PropositionalEquality as Eqality
+open Eqality using (refl; trans; sym; cong; cong-app; subst) renaming (_≡_ to _===_) public
+open Eqality.≡-Reasoning using (begin_; step-≡; step-≡˘) renaming (_≡⟨⟩_ to _=<>_ ; _∎ to _end) public
 
 private
   variable
-    l ll : Level
+    l ll l1 l2 : Level
 
 infixr 2 _=<_>_ _=^<_>_
 
@@ -21,6 +21,8 @@ a =^< b > c =  a ≡˘⟨ c ⟩ b
 
 
 data BOT {l} : Set l where
+data TOP {l} : Set l where
+  <> : TOP
 
 infix 3 ¬_
 ¬_ : Set l -> Set (lsuc l)
@@ -68,5 +70,21 @@ data _or_ (A B : Set l) : Set l where
   left : A -> A or B
   right : B -> A or B
 
-const : {A B : Set l} -> A -> B -> A
+const : {A : Set l1} {B : Set l2} -> A -> B -> A
 const x _ = x
+
+absurd : {A : Set l} -> BOT {l} -> A
+absurd ()
+
+
+record Eq (A : Set l) : Set l where
+  field
+    _==_ : A -> A -> Bool {l}
+
+record Monad (M : Set l -> Set l) : Set (lsuc l) where
+  field
+    return : {A : Set l} -> A -> M A
+    _>>=_ : {A B : Set l} -> M A -> (A -> M B) -> M B
+
+  _>>_ : {A B : Set l} -> M A -> M B -> M B
+  ma >> mb = ma >>= const mb
